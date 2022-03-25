@@ -1,0 +1,32 @@
+# Find the dataset here: https://www.kaggle.com/datasets/danielgrijalvas/movies
+install.packages("writexl")
+library(writexl)
+library(tidyverse)
+
+movies <- read_csv("movies.csv")
+
+# Get a list of duplicate movies
+duplicate_movies <- movies %>%
+  count(name) %>%
+  filter(n > 1)
+
+# Drop movies that is duplicated. Drop NA values for gross and budget, and runtime
+tidy_movies <- movies %>%
+  anti_join(duplicate_movies, by = "name") %>%
+  filter(!is.na(gross), !is.na(budget), !is.na(runtime)) %>%
+  # Separate released column to month, day, year, and country
+  separate(released, sep = ", ", into = c("released_date", "released_country_year")) %>%
+  separate(released_country_year, sep = 5, into = c("released_year", "released_country")) %>%
+  separate(released_date, sep = " ", into = c("released_month", "released_day")) %>%
+  # Change the data types of released_day and released_year
+  mutate(across(c("released_day", "released_year"), as.double))
+
+# Remove the () in countries
+tidy_relased_country <- str_sub(tidy_movies$released_country, 2, str_length(tidy_movies$released_country) - 1)
+tidy_movies <- mutate(tidy_movies, released_country = tidy_relased_country)
+
+#Check the dataset again
+summary(tidy_movies)
+
+#Export to the Excel files for the project
+write_xlsx(tidy_movies, "tidy_movies.xlsx")
