@@ -20,11 +20,35 @@ tidy_movies <- movies %>%
   separate(released_country_year, sep = 5, into = c("released_year", "released_country")) %>%
   separate(released_date, sep = " ", into = c("released_month", "released_day")) %>%
   # Change the data types of released_day and released_year
-  mutate(across(c("released_day", "released_year"), as.double))
+  mutate(across(c("released_day", "released_year"), as.double)) %>%
+  # Add a surrogate key
+  mutate(Id = row_number()) %>%
+  relocate(Id, .before = name)
 
 # Remove the () in countries
 tidy_relased_country <- str_sub(tidy_movies$released_country, 2, str_length(tidy_movies$released_country) - 1)
 tidy_movies <- mutate(tidy_movies, released_country = tidy_relased_country)
+
+# Rename all columns
+tidy_movies <- tidy_movies %>% 
+  rename(c(Name = name,
+         Rating = rating,
+         Genre = genre,
+         Year = year,
+         "Released Month" = released_month,
+         "Released Day" = released_day,
+         "Released Year" = released_year,
+         "Released Country" = released_country,
+         Score = score,
+         Votes = votes,
+         Director = director,
+         Writer = writer,
+         Star = star,
+         Country = country,
+         Budget = budget,
+         Gross = gross,
+         Company = company,
+         Runtime = runtime))
 
 # Check the dataset again
 summary(tidy_movies)
