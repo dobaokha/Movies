@@ -9,6 +9,7 @@ movies <- read_csv("movies.csv")
 duplicate_movies <- movies %>%
   count(name) %>%
   filter(n > 1)
+  
 
 # Drop movies that is duplicated. Drop NA values for gross and budget, and runtime
 tidy_movies <- movies %>%
@@ -25,8 +26,8 @@ tidy_movies <- movies %>%
 tidy_relased_country <- str_sub(tidy_movies$released_country, 2, str_length(tidy_movies$released_country) - 1)
 tidy_movies <- mutate(tidy_movies, released_country = tidy_relased_country)
 
-#Check the dataset again
+# Check the dataset again
 summary(tidy_movies)
 
-#Export to the Excel files for the project
+# Export to the Excel files for the project
 write_xlsx(tidy_movies, "tidy_movies.xlsx")
